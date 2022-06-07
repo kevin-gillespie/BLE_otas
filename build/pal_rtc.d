@@ -1,0 +1,26 @@
+/mnt/c/Users/terry.wu/workspace/BLE_OTAs/build/pal_rtc.o: \
+ Libraries/Cordio/platform/targets/maxim/max32665/sources/pal_rtc.c \
+ Libraries/Cordio/platform/include/pal_rtc.h \
+ Libraries/Cordio/platform/include/pal_types.h \
+ /usr/lib/gcc/arm-none-eabi/9.2.1/include/stdint.h \
+ /usr/lib/gcc/arm-none-eabi/9.2.1/include/stddef.h \
+ Libraries/Cordio/platform/include/pal_led.h \
+ Libraries/Cordio/platform/include/pal_sys.h \
+ Libraries/PeriphDrivers/Include/MAX32665/wut.h \
+ Libraries/PeriphDrivers/Include/MAX32665/mxc_device.h \
+ Libraries/CMSIS/Device/Maxim/MAX32665/Include/max32665.h \
+ Libraries/CMSIS/Include/core_cm4.h \
+ Libraries/CMSIS/Include/core_cmInstr.h \
+ Libraries/CMSIS/Include/core_cmFunc.h \
+ Libraries/CMSIS/Include/core_cm4_simd.h \
+ Libraries/CMSIS/Device/Maxim/MAX32665/Include/system_max32665.h \
+ Libraries/PeriphDrivers/Include/MAX32665/mxc_errors.h \
+ Libraries/PeriphDrivers/Include/MAX32665/mxc_pins.h \
+ Libraries/PeriphDrivers/Include/MAX32665/gpio.h \
+ Libraries/CMSIS/Device/Maxim/MAX32665/Include/gpio_regs.h \
+ Libraries/CMSIS/Device/Maxim/MAX32665/Include/wut_regs.h \
+ Libraries/PeriphDrivers/Include/MAX32665/lp.h \
+ Libraries/CMSIS/Device/Maxim/MAX32665/Include/pwrseq_regs.h \
+ Libraries/CMSIS/Device/Maxim/MAX32665/Include/mcr_regs.h \
+ Libraries/CMSIS/Device/Maxim/MAX32665/Include/gcr_regs.h \
+ Libraries/PeriphDrivers/Include/MAX32665/mxc_device.h

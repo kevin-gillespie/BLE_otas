@@ -1,0 +1,13 @@
+export MAXIM_PATH="/mnt/c/Maxim"
+
+
+openocd -f ./script/max32665.cfg -c "program ./build/max32665.elf verify reset exit"
+
+
+openocd -f max32665.cfg -c "program max32665.elf verify reset exit"
+
+
+
+
+//with bootloader
+openocd -f ./script/max32665.cfg -c "program ./build/max32665.bin 0x10004000  verify reset exit"

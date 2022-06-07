@@ -1,0 +1,21 @@
+/mnt/c/Users/terry.wu/workspace/BLE_OTAs/build/sch_list.o: \
+ Libraries/Cordio/controller/sources/common/sch/sch_list.c \
+ Libraries/Cordio/controller/sources/common/sch/sch_int.h \
+ Libraries/Cordio/controller/include/common/sch_api.h \
+ Libraries/Cordio/wsf/include/wsf_types.h \
+ /usr/lib/gcc/arm-none-eabi/9.2.1/include/stdint.h \
+ /usr/lib/gcc/arm-none-eabi/9.2.1/include/stddef.h \
+ Libraries/Cordio/wsf/include/wsf_os.h \
+ Libraries/Cordio/wsf/include/wsf_types.h \
+ Libraries/Cordio/wsf/include/wsf_queue.h \
+ Libraries/Cordio/controller/include/common/bb_api.h \
+ Libraries/Cordio/controller/include/common/cfg_mac.h \
+ Libraries/Cordio/platform/include/pal_bb.h \
+ Libraries/Cordio/platform/include/pal_types.h \
+ Libraries/Cordio/wsf/include/wsf_assert.h \
+ Libraries/Cordio/wsf/include/wsf_trace.h \
+ /usr/lib/gcc/arm-none-eabi/9.2.1/include/stdarg.h \
+ Libraries/Cordio/platform/include/pal_timer.h \
+ Libraries/Cordio/wsf/include/wsf_cs.h \
+ Libraries/Cordio/wsf/include/wsf_math.h \
+ Libraries/Cordio/wsf/include/wsf_trace.h

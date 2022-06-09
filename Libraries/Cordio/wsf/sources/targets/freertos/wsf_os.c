@@ -59,8 +59,8 @@ WSF_CT_ASSERT(sizeof(uint32_t) == 4);
 
 #define WSF_DISPATCHER_MSG_STACK_SIZE									4096
 #define WSF_DISPATCHER_HND_STACK_SIZE									8128
-#define WSF_DISPATCHER_MSG_TASK_PRIORITY							configMAX_PRIORITIES - 2
-#define WSF_DISPATCHER_HND_TASK_PRIORITY							configMAX_PRIORITIES - 3
+#define WSF_DISPATCHER_MSG_TASK_PRIORITY							configMAX_PRIORITIES - 3
+#define WSF_DISPATCHER_HND_TASK_PRIORITY							configMAX_PRIORITIES - 2
 
 /*! \brief OS serivice function number */
 #define WSF_OS_MAX_SERVICE_FUNCTIONS                  3

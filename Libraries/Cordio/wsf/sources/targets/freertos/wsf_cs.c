@@ -44,13 +44,10 @@ uint8_t wsfCsNesting = 0;
 /*************************************************************************************************/
 void WsfCsEnter(void)
 {
-  if (xPortIsInsideInterrupt()) {
-    return;
-  }
+    __asm volatile( "cpsid i" );
 
-  if (__atomic_fetch_add(&wsfCsNesting, 1, __ATOMIC_ACQ_REL) == 0) {
-    portENTER_CRITICAL();
-  }
+    wsfCsNesting++;
+
 }
 
 /*************************************************************************************************/
@@ -60,15 +57,9 @@ void WsfCsEnter(void)
 /*************************************************************************************************/
 void WsfCsExit(void)
 {
-  if (xPortIsInsideInterrupt()) {
-    return;
-  }
+    wsfCsNesting--;
 
-  WSF_ASSERT(__atomic_load_n(&wsfCsNesting, __ATOMIC_ACQUIRE) != 0);
-
-  __atomic_fetch_sub(&wsfCsNesting, 1, __ATOMIC_RELEASE);
-
-  if (wsfCsNesting == 0) {
-    portEXIT_CRITICAL();
-  }
+    if (wsfCsNesting == 0) {
+        __asm volatile( "cpsie i" );
+    }
 }

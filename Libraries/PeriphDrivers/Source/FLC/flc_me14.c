@@ -242,7 +242,7 @@ int MXC_FLC_Write32 (uint32_t address, uint32_t data)
         return E_BAD_STATE;
     }
 
-    return MXC_FLC_RevA_Write32 ((mxc_flc_reva_regs_t*) flc, address, data, addr);
+    return MXC_FLC_RevA_Write32Using128 ((mxc_flc_reva_regs_t*) flc, address, data, addr);
 }
 
 int MXC_FLC_Write (uint32_t address, uint32_t length, uint32_t *buffer)

@@ -65,7 +65,7 @@
 **************************************************************************************************/
 
 #ifndef BLINK_LED
-#define BLINK_LED                         1
+#define BLINK_LED                         0
 #endif
 
 #define BLINK_TIMER_EVT                   0x98

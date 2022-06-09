@@ -64,6 +64,7 @@
 
 #include "dats_api.h"
 #include "wdxs/wdxs_api.h"
+#include "pal_led.h"
 
 #if defined(HCI_TR_EXACTLE) && (HCI_TR_EXACTLE == 1)
 #include "ll_init_api.h"
@@ -143,7 +144,7 @@ void StackInitDats(void)
     SmpHandlerInit(handlerId);
     SmprInit();
     SmprScInit();
-    HciSetMaxRxAclLen(100);
+    HciSetMaxRxAclLen(256);
 
     handlerId = WsfOsSetNextHandler(AppHandler);
     AppHandlerInit(handlerId);
@@ -151,8 +152,8 @@ void StackInitDats(void)
     handlerId = WsfOsSetNextHandler(DatsHandler);
     DatsHandlerInit(handlerId);
 
-    //handlerId = WsfOsSetNextHandler(WdxsHandler);
-    //WdxsHandlerInit(handlerId);
+    handlerId = WsfOsSetNextHandler(WdxsHandler);
+    WdxsHandlerInit(handlerId);
 }
 
 /*************************************************************************************************/
@@ -202,6 +203,8 @@ static void mainWsfInit(void)
 /*************************************************************************************************/
 void WUT_IRQHandler(void)
 {
+    MXC_WUT_IntClear();
+    NVIC_ClearPendingIRQ(WUT_IRQn);
     MXC_WUT_Handler();
 }
 
@@ -238,6 +241,85 @@ void wutTrimCb(int err)
 void setAdvTxPower(void)
 {
     LlSetAdvTxPower(DEFAULT_TX_POWER);
+}
+
+void setInterruptPriority(void)
+{
+    /* Interrupts using FreeRTOS functions must have priorities between configMAX_PRIORITIES and
+    configMAX_SYSCALL_INTERRUPT_PRIORITY, lower priority number is higher priority */
+
+    /* Setup BLE hardware interrupt priorities */
+    NVIC_SetPriority(BTLE_TX_DONE_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_RX_RCVD_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_RX_ENG_DET_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_SFD_DET_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_SFD_TO_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_GP_EVENT_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_CFO_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_SIG_DET_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_AGC_EVENT_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_RFFE_SPIM_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_TX_AES_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_RX_AES_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_INV_APB_ADDR_IRQn, (configMAX_PRIORITIES-2));
+    NVIC_SetPriority(BTLE_IQ_DATA_VALID_IRQn, (configMAX_PRIORITIES-2));
+
+    /* Setup scheduler timer priorities */
+    NVIC_SetPriority(TMR0_IRQn, (configMAX_PRIORITIES-1));
+    NVIC_SetPriority(TMR1_IRQn, (configMAX_PRIORITIES-1));
+
+    NVIC_SetPriority(WUT_IRQn, configMAX_PRIORITIES-1);
+
+    /* Setup additional peripheral timer priorities */
+    NVIC_SetPriority(UART0_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(UART1_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(UART2_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(UART3_IRQn, (configMAX_PRIORITIES-0));
+
+    NVIC_SetPriority(DMA0_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA1_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA2_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA3_IRQn, (configMAX_PRIORITIES-0));
+
+    NVIC_SetPriority(DMA4_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA5_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA6_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA7_IRQn, (configMAX_PRIORITIES-0));
+
+    NVIC_SetPriority(DMA8_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA9_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA10_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA11_IRQn, (configMAX_PRIORITIES-0));
+
+    NVIC_SetPriority(DMA12_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA13_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA14_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(DMA15_IRQn, (configMAX_PRIORITIES-0));
+
+    NVIC_SetPriority(GPIO0_IRQn, (configMAX_PRIORITIES-0));
+    NVIC_SetPriority(GPIO1_IRQn, (configMAX_PRIORITIES-0));
+}
+
+void trim32k(void)
+{
+    /* Start the 32 MHz crystal and the BLE DBB counter to trim the 32 kHz crystal */
+    PalBbEnable();
+
+    NVIC_EnableIRQ(WUT_IRQn);
+
+    /* Output buffered square wave of 32 kHz clock to GPIO */
+    // MXC_RTC_SquareWaveStart(MXC_RTC_F_32KHZ);
+
+    /* Execute the trim procedure */
+    wutTrimComplete = 0;
+    if(MXC_WUT_TrimCrystalAsync(wutTrimCb) != E_NO_ERROR) {
+        APP_TRACE_INFO0("Error with 32k trim");
+    } else {
+        while(!wutTrimComplete) {}
+    }
+
+    /* Shutdown the 32 MHz crystal and the BLE DBB */
+    PalBbDisable();
 }
 
 /*************************************************************************************************/
@@ -308,47 +390,12 @@ void bleStartup(void)
     LlSetBdAddr((uint8_t *)&bdAddr);
 #endif
 
-    /* Setup BLE hardware interrupt priorities */
-    NVIC_SetPriority(BTLE_TX_DONE_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_RX_RCVD_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_RX_ENG_DET_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_SFD_DET_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_SFD_TO_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_GP_EVENT_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_CFO_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_SIG_DET_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_AGC_EVENT_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_RFFE_SPIM_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_TX_AES_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_RX_AES_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_INV_APB_ADDR_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(BTLE_IQ_DATA_VALID_IRQn, configMAX_PRIORITIES-3);
+    trim32k();
 
-    NVIC_SetPriority(TMR0_IRQn, configMAX_PRIORITIES-3);
-    NVIC_SetPriority(TMR1_IRQn, configMAX_PRIORITIES-3);
+    setInterruptPriority();
 
-    NVIC_SetPriority(UART0_IRQn, configMAX_PRIORITIES-2);
-    NVIC_SetPriority(UART1_IRQn, configMAX_PRIORITIES-2);
-    NVIC_SetPriority(UART2_IRQn, configMAX_PRIORITIES-2);
-    NVIC_SetPriority(UART3_IRQn, configMAX_PRIORITIES-2);
-
-    /* Start the 32 MHz crystal and the BLE DBB counter to trim the 32 kHz crystal */
-    PalBbEnable();
-
-    /* Output buffered square wave of 32 kHz clock to GPIO */
-    MXC_RTC_SquareWaveStart(MXC_RTC_F_32KHZ);
-
-    /* Execute the trim procedure */
-    wutTrimComplete = 0;
-    MXC_WUT_TrimCrystalAsync(wutTrimCb);
-    while(!wutTrimComplete) {}
-
-    /* Stop here to measure the 32 kHz clock */
-    /* while(1) {} */
-    MXC_RTC_SquareWaveStop();
-
-    /* Shutdown the 32 MHz crystal and the BLE DBB */
-    PalBbDisable();
+    /* Disable Cordio stack usage of the LEDs */
+    PalLedDeInit();
 
     StackInitDats();
     DatsStart();

@@ -52,7 +52,7 @@
  *----------------------------------------------------------*/
 
 /* CMSIS keeps a global updated with current system clock in Hz */
-#define configCPU_CLOCK_HZ          ((unsigned long)HIRC_FREQ)
+#define configCPU_CLOCK_HZ          ((unsigned long)HIRC96_FREQ)
 
 /* #define configUSE_TICKLESS_IDLE     1 */
 
@@ -66,11 +66,10 @@ increase the amount of time spent in standby mode, thus reducing average power c
 
 #define configRTC_TICK_RATE_HZ      (32768)
 
-#define configTOTAL_HEAP_SIZE       ((size_t)(64 * 1024))
+#define configTOTAL_HEAP_SIZE       ((size_t)(256 * 1024))
 
 #define configMINIMAL_STACK_SIZE    ((unsigned short)128)
 
-#define configMAX_PRIORITIES        5
 #define configUSE_PREEMPTION        1
 #define configUSE_IDLE_HOOK         1
 #define configUSE_TICK_HOOK         0
@@ -79,7 +78,7 @@ increase the amount of time spent in standby mode, thus reducing average power c
 #define configUSE_MUTEXES           1
 
 #define configUSE_TIMERS                1
-#define configTIMER_TASK_PRIORITY       (configMAX_PRIORITIES - 4)
+#define configTIMER_TASK_PRIORITY       (configMAX_PRIORITIES - 3)
 #define configTIMER_QUEUE_LENGTH        8
 #define configTIMER_TASK_STACK_DEPTH    configMINIMAL_STACK_SIZE
 
@@ -99,8 +98,10 @@ to exclude the API function. */
 /* # of priority bits (configured in hardware) is provided by CMSIS */
 #define configPRIO_BITS             __NVIC_PRIO_BITS
 
-/* Priority 7, or 255 as only the top three bits are implemented.  This is the lowest priority. */
-#define configKERNEL_INTERRUPT_PRIORITY       ( ( unsigned char ) 7 << ( 8 - configPRIO_BITS) )
+#define configMAX_PRIORITIES        ((0x1 << configPRIO_BITS)-1)
+
+/* Only the top three bits are implemented.  This is the lowest priority. */
+#define configKERNEL_INTERRUPT_PRIORITY       ( ( unsigned char ) configMAX_PRIORITIES << ( 8 - configPRIO_BITS) )
 
 /* Priority 5, or 160 as only the top three bits are implemented. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY  ( ( unsigned char ) 5 << ( 8 - configPRIO_BITS) )

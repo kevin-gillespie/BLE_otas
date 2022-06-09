@@ -159,11 +159,6 @@ void PalTimerInit(PalTimerCompCback_t expCback)
   PAL_TIMER_CHECK(palTimerCb.state == PAL_TIMER_STATE_UNINIT);
   PAL_TIMER_CHECK(expCback != NULL);
 
-  /* TODO: Figure out priority for RISCV */
-#ifndef __riscv
-  /* Give scheduler timer the highest priority. */
-  NVIC_SetPriority(PAL_TMR_IRQn, 0);
-#endif
 
   tmr_cfg.pres = TMR_PRES_1;
   tmr_cfg.mode = TMR_MODE_ONESHOT;
@@ -279,6 +274,11 @@ void PalTimerStart(uint32_t expUsec)
   PAL_TIMER_CHECK(palTimerCb.state == PAL_TIMER_STATE_READY);
   PAL_TIMER_CHECK(expUsec != 0);
 
+  /* Make sure we don't wrap the timeout */
+  if(expUsec == 0) {
+    expUsec = 1;
+  }
+
   /* Convert the time based on our calibration */
   expUsec += (expUsec/PAL_TMR_CALIB_TIME)*palTimerCb.usecDiff;
 
@@ -370,7 +370,7 @@ uint32_t PalTimerGetExpTime(void)
 {
   uint32_t time;
 
-  /* See if the timer is currently running */  
+  /* See if the timer is currently running */
   if(palTimerCb.state != PAL_TIMER_STATE_BUSY) {
     return 0;
   }
@@ -378,5 +378,8 @@ uint32_t PalTimerGetExpTime(void)
   time = MXC_TMR_GetCompare(PAL_TMR) - MXC_TMR_GetCount(PAL_TMR);
   time /= (PeripheralClock/1000000);
 
+  /* Adjust time based on the calibrated value */
+  time = time - ((time/PAL_TMR_CALIB_TIME)*palTimerCb.usecDiff);
+  
   return time;
 }
